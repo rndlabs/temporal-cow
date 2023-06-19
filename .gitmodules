@@ -13,3 +13,6 @@
 [submodule "lib/aave"]
 	path = lib/aave
 	url = https://github.com/aave/aave-v3-core
+[submodule "lib/@openzeppelin"]
+	path = lib/@openzeppelin
+	url = https://github.com/openzeppelin/openzeppelin-contracts
