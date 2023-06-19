@@ -68,9 +68,9 @@ contract TemporalCow is ReentrancyGuard {
             GPv2Interaction.Data calldata call = calls[i];
             GPv2Interaction.execute(call);
         }
-        if (callback) {
-            revert(CallbackNotCleared());
-        }
+        // We clear the callback after the settlement is done, so that we can't be re-entered
+        // by the settlement contract.
+        callback = GPv2Interaction.Data(address(0), 0, "");
     }
 
     /**
@@ -78,10 +78,13 @@ contract TemporalCow is ReentrancyGuard {
      * @dev By using a fallback handler here we can cover any flashloan callback.
      */
     fallback() external nonReentrant {
-        if (!callback) {
-            // If there is no callback, we revert.
-            revert(NoCallback());
+        // If the callback is an empty interaction, we revert.
+        if (!(callback.target != address(0))) {
+            revert NoCallback();
         }
+
+        execute(callback);
+    }
 
     /// @dev Execute an arbitraty contract interaction from storage.
     /// @param interaction Interaction data.
