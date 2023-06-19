@@ -13,3 +13,4 @@ murky/=lib/composable/lib/murky/src/
 openzeppelin-contracts/=lib/composable/lib/canonical-weth/lib/openzeppelin-contracts/
 openzeppelin/=lib/composable/lib/@openzeppelin/contracts/
 safe/=lib/safe/
+aave/=lib/aave/contracts/
