@@ -1,0 +1,15 @@
+@openzeppelin/=lib/composable/lib/@openzeppelin/
+@openzeppelin/contracts/=lib/composable/lib/@openzeppelin/contracts/
+balancer/=lib/composable/lib/balancer/src/
+canonical-weth/=lib/composable/lib/canonical-weth/src/
+composable/=lib/composable/
+cowprotocol/=lib/cowprotocol/src/contracts
+ds-test/=lib/forge-std/lib/ds-test/src/
+erc4626-tests/=lib/composable/lib/@openzeppelin/lib/erc4626-tests/
+forge-std/=lib/forge-std/src/
+helpers/=lib/composable/lib/balancer/src/lib/helpers/
+math/=lib/composable/lib/balancer/src/lib/math/
+murky/=lib/composable/lib/murky/src/
+openzeppelin-contracts/=lib/composable/lib/canonical-weth/lib/openzeppelin-contracts/
+openzeppelin/=lib/composable/lib/@openzeppelin/contracts/
+safe/=lib/safe/
