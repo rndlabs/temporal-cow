@@ -17,7 +17,7 @@ contract TemporalCow is ReentrancyGuard {
     GPv2Settlement public immutable settlement;
 
     // --- mutable variables
-    GPv2Interaction.Data private callback;   // use TSTORE in the future
+    GPv2Interaction.Data private callback; // use TSTORE in the future
 
     // --- errors
     error NotSolver();
@@ -39,17 +39,17 @@ contract TemporalCow is ReentrancyGuard {
     /// senders from settling batches.
     modifier onlySolver() {
         if (!authenticator.isSolver(msg.sender)) {
-            revert(NotSolver());
+            revert NotSolver();
         }
         _;
     }
 
     /**
      * Execute interactions prior to the main settlement
-     * @param call interactions to be executed prior to callback
+     * @param calls interactions to be executed prior to callback
      * @param _callback interaction to be executed as the callback
      */
-    function flashloanAndSettle(GPv2Interaction.Data[] calldata calls, GPv2Interaction.Data _callback)
+    function flashloanAndSettle(GPv2Interaction.Data[] calldata calls, GPv2Interaction.Data calldata _callback)
         external
         onlySolver
     {
@@ -89,7 +89,7 @@ contract TemporalCow is ReentrancyGuard {
     /// @param interaction Interaction data.
     function execute(GPv2Interaction.Data memory interaction) internal {
         // call the target with the callData and value
-        (bool success, ) = interaction.target.call{value: interaction.value}(interaction.callData);
+        (bool success,) = interaction.target.call{value: interaction.value}(interaction.callData);
 
         // revert if the call failed
         require(success);
