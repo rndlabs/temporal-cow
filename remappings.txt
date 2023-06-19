@@ -1,5 +1,3 @@
-@openzeppelin/=lib/composable/lib/@openzeppelin/
-@openzeppelin/contracts/=lib/composable/lib/@openzeppelin/contracts/
 balancer/=lib/composable/lib/balancer/src/
 canonical-weth/=lib/composable/lib/canonical-weth/src/
 composable/=lib/composable/
@@ -10,7 +8,7 @@ forge-std/=lib/forge-std/src/
 helpers/=lib/composable/lib/balancer/src/lib/helpers/
 math/=lib/composable/lib/balancer/src/lib/math/
 murky/=lib/composable/lib/murky/src/
-openzeppelin-contracts/=lib/composable/lib/canonical-weth/lib/openzeppelin-contracts/
-openzeppelin/=lib/composable/lib/@openzeppelin/contracts/
-safe/=lib/safe/
+@openzeppelin/=lib/@openzeppelin/contracts/
+@openzeppelin/contracts/=lib/@openzeppelin/contracts/
+safe/=lib/safe/contracts/
 aave/=lib/aave/contracts/
