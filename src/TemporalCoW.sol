@@ -82,7 +82,14 @@ contract TemporalCow is ReentrancyGuard {
             // If there is no callback, we revert.
             revert(NoCallback());
         }
-        GPv2Interaction.execute(callback);
-        delete callback;
+
+    /// @dev Execute an arbitraty contract interaction from storage.
+    /// @param interaction Interaction data.
+    function execute(GPv2Interaction.Data memory interaction) internal {
+        // call the target with the callData and value
+        (bool success, ) = interaction.target.call{value: interaction.value}(interaction.callData);
+
+        // revert if the call failed
+        require(success);
     }
 }
