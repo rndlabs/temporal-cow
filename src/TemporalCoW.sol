@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-
 import "cowprotocol/libraries/GPv2Order.sol";
 import "cowprotocol/libraries/GPv2Interaction.sol";
+import "cowprotocol/mixins/ReentrancyGuard.sol";
 import "cowprotocol/GPv2Settlement.sol";
 
 /**
