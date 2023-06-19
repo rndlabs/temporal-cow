@@ -10,3 +10,6 @@
 [submodule "lib/cowprotocol"]
 	path = lib/cowprotocol
 	url = https://github.com/cowprotocol/contracts
+[submodule "lib/aave"]
+	path = lib/aave
+	url = https://github.com/aave/aave-v3-core
