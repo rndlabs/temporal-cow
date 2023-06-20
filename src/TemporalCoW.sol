@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import {FlashAbstract} from "dss-interfaces/dss/FlashAbstract.sol";
+
 import "cowprotocol/libraries/GPv2Order.sol";
 import "cowprotocol/libraries/GPv2Interaction.sol";
 import "cowprotocol/mixins/ReentrancyGuard.sol";
@@ -12,9 +14,13 @@ import "cowprotocol/GPv2Settlement.sol";
  * @notice TBD
  */
 contract TemporalCow is ReentrancyGuard {
+    // --- constants
+    IERC20 private constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+
     // --- immutable variables
     GPv2Authentication public immutable authenticator;
     GPv2Settlement public immutable settlement;
+    FlashAbstract public immutable flash;
 
     // --- mutable variables
     GPv2Interaction.Data private callback; // use TSTORE in the future
@@ -28,9 +34,13 @@ contract TemporalCow is ReentrancyGuard {
      * Initialise the temporal CoW contract with the main settlement contract.
      * @param _settlement the main settlement contract
      */
-    constructor(GPv2Settlement _settlement) {
+    constructor(GPv2Settlement _settlement, FlashAbstract _flash) {
         settlement = _settlement;
+        flash = _flash;
         authenticator = GPv2Authentication(address(_settlement.authenticator()));
+
+        // On initialization we need to approve the flashloan contract to pull DAI
+        dai.approve(address(_flash), type(uint256).max);
     }
 
     // --- modifiers
@@ -42,6 +52,25 @@ contract TemporalCow is ReentrancyGuard {
             revert NotSolver();
         }
         _;
+    }
+
+    /**
+     * A hacky workaround to minimize work in the backend.
+     * @dev See GPv2Settlement.settle
+     */
+    function settle(
+        IERC20[] calldata,
+        uint256[] calldata,
+        GPv2Trade.Data[] calldata,
+        GPv2Interaction.Data[][3] calldata
+    ) external onlySolver {
+        callback = GPv2Interaction.Data(address(settlement), 0, msg.data);
+
+        // The flashloan contract is already approved to pull dai, so we can just call it
+        flash.flashLoan(address(this), address(dai), flash.max(), "");
+
+        // Clear the callback after the settlement is done, so the fallback handler is protected
+        callback = GPv2Interaction.Data(address(0), 0, "");
     }
 
     /**
@@ -76,20 +105,24 @@ contract TemporalCow is ReentrancyGuard {
      * Fallback handler to generalise ERC-3156 / AAVE flashloan callback.
      * @dev By using a fallback handler here we can cover any flashloan callback.
      */
-    fallback() external nonReentrant {
+    fallback(bytes calldata) external nonReentrant returns (bytes memory) {
         // If the callback is an empty interaction, we revert.
         if (!(callback.target != address(0))) {
             revert NoCallback();
         }
 
         execute(callback);
+
+        return abi.encode(keccak256("ERC3156FlashBorrower.onFlashLoan"));
     }
+
+    // --- internal helpers
 
     /// @dev Execute an arbitraty contract interaction from storage.
     /// @param interaction Interaction data.
     function execute(GPv2Interaction.Data memory interaction) internal {
         // call the target with the callData and value
-        (bool success,) = interaction.target.call{value: interaction.value}(interaction.callData);
+        (bool success, ) = interaction.target.call{value: interaction.value}(interaction.callData);
 
         // revert if the call failed
         require(success);
